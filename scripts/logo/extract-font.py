@@ -13,7 +13,8 @@ from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 
 # 1. Load the font file
-font = TTFont("PlaywriteAR-Regular.ttf")  # Playwrite-Argentina
+# font = TTFont("PlaywriteAR-Regular.ttf")  # Playwrite-Argentina
+font = TTFont("PlaywriteUSTrad-Regular.ttf")  # Playwrite-Argentina
 glyph_set = font.getGlyphSet()
 glyph_name = font.getBestCmap()[ord("j")]
 
@@ -41,7 +42,9 @@ svg_content = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb_x} {vb_y}
   <path d="{path_data}" />
 </svg>'''
 
-with open("playwrite-argentina-j.svg", "w") as f:
+svg_filename = "playwrite-us-j.svg"
+#` with open("playwrite-argentina-j.svg", "w") as f:
+with open(svg_filename, "w") as f:
     f.write(svg_content)
 
-print("Successfully generated playwrite-argentina-j.svg with all components included.")
+print(f"Successfully generated {svg_filename} with all components included.")
