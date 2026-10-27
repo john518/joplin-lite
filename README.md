@@ -1,36 +1,21 @@
 # Joplin Lite
 
-A lightweight, high-performance desktop application built with Python (`pywebview`), a native local backend, and a Vue/Vite reactive UI (`ui/`).
+Joplin-Lite is a desktop application that duplicates a core subset of the official Joplin Desktop application but with a much smaller disk and memory footprint. The official app is built on the Electron platform, which presents a large disk footprint (500+ MB) and memory footprint (400+ MB). Joplin-Lite, on the other hand, is a `pywebview` app that uses native OS libraries for rendering the user interface and, as such, consumes significantly less computing resources.
 
-## Overview
+## Main Features
 
-[Provide a brief description of what this custom desktop utility does.]
+- **Joplin Itegration:** Connects to the Joplin Data/API server for note access, management, and synchronization with remote storage.
+- **3-Column Layout:** Mirrors the traditional Joplin Desktop interface. The first column displays a tree view of the user's notebooks, the second lists note titles for the selected folder, and the third renders the selected note.
+- **Markdown & Rendered Views:** Provides access to all notes for editing markdown alongside a display toggle for rendered formats.
 
-## Core Features
+## Technical Stack
 
-- **Modern Desktop Shell:** Wrapped via `pywebview` to leverage native OS rendering engines with minimal resource overhead.
-- **Reactive UI:** Built using Vue.js and Vite inside the `ui/` directory.
-- **Local Data Integration:** Communicates with local application backends or API layers.
+- `pywebview` wraps the UI and manages the underlying Joplin Data/API server.
+- `Vue.js / Vite` powers the reactive user interface.
+- The UI communicates with the local Joplin Data/API server through the python backend instead of directly, in order to bypass CORS restrictions in the front-end web view.
 
-## Getting Started
+## Deferred / Out of Scope
 
-### Prerequisites
-
-Make sure you have the following installed on your system:
-- [uv](https://docs.astral.sh/uv/) (Python package and project manager)
-- [Node.js & npm](https://nodejs.org/) (Frontend asset management)
-
-### Running the App
-
-Use the provided build and execution script to compile the frontend assets and launch the application:
-
-```bash
-./scripts/build_run.sh
-
-Development
-
-    Backend: Python logic lives in joplin-lite/
-
-    Frontend: Vue/Vite source code lives in ui/
-
-    Testing: Run tests using uv run pytest
+- **Platform Support:** Initial development is focused on Linux and macOS. There are no plans to support Windows.
+- **Packaging:** Joplin Lite is for developers familiar with working in a terminal environment and running from source code. There is no plan to make installers or provide other packaging for "one click" use.
+- **Advanced Features:** Joplin todos, note tags, and WYSIWYG editing are excluded from the initial version to maintain a lightweight scope.
