@@ -39,12 +39,22 @@ def test_joplin_connection():
 
     BASE_URL = f"http://localhost:{api_port}"
 
-    url = f"{BASE_URL}/folders"
     params = {"token": api_token}
 
     print(f"Connecting to Joplin API at {BASE_URL}...")
 
     try:
+        # ping endpoint is documented (https://joplinapp.org/help/api/references/rest_api)
+        # but does not work ("Error details: Expecting value: line 1 column 1 (char 0)")
+        #
+        # url = f"{BASE_URL}/ping"
+        # response = requests.get(url, timeout=5)
+        # response.raise_for_status()
+        # data = response.json()
+        # print("Server response (data):")
+        # print(data)
+
+        url = f"{BASE_URL}/folders"
         response = requests.get(url, params=params, timeout=5)
         response.raise_for_status()
         data = response.json()
