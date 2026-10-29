@@ -11,12 +11,21 @@ or static production build files.
 # ///
 
 import argparse
+import logging
+import sys
 from pathlib import Path
 
 import webview
 
 from joplin_lite.api import Api
 from joplin_lite.platforms import setup_window_features
+
+from joplin_lite.joplin_server import (
+    start_server, wait_for_server, stop_server, get_api_credentials
+)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("main")
 
 
 
@@ -29,13 +38,19 @@ def get_target_window_size(scale=0.8):
     return width, height
 
 
-def main():
-    """Initialize and start the pywebview desktop window."""
+def main() -> int:
+    """Initialize and start the joplin data/api server and pywebview desktop window."""
     parser = argparse.ArgumentParser(description="Starts the application")
     parser.add_argument("-d", "--debug", action="store_true", help="Open inspection panel.")
     args = parser.parse_args()
 
-    # Initialize API instance
+    # Start the joplin data/api server
+    _proc = start_server()
+    ok = wait_for_server()
+    if not ok:
+        sys.exit(1)
+
+    # Initialize pywebview API instance
     api = Api()
 
     win_width, win_height = get_target_window_size(scale=0.8)
