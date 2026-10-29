@@ -19,3 +19,7 @@ Joplin-Lite is a desktop application that duplicates a core subset of the offici
 - **Platform Support:** Initial development is focused on Linux and macOS. There are no plans to support Windows.
 - **Packaging:** Joplin Lite is for developers familiar with working in a terminal environment and running from source code. There is no plan to make installers or provide other packaging for "one click" use.
 - **Advanced Features:** Joplin todos, note tags, and WYSIWYG editing are excluded from the initial version to maintain a lightweight scope.
+
+## Notes
+
+- See [Joplin Server Setup](./docs/joplin_server_setup.md) for info on configuring your Joplin Data/API server.

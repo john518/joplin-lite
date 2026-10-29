@@ -2,7 +2,6 @@
 # requires-python = ">=3.10"
 # dependencies = [
 #     "requests",
-#     "python-dotenv",
 # ]
 # ///
 
@@ -15,22 +14,33 @@ Usage:
     uv run test_joplin_connection.py
 """
 
-import os
+import json
 import sys
 import requests
-from dotenv import load_dotenv
+from pathlib import Path
 
-# Load environment variables from a local .env file if present
-load_dotenv()
-
-BASE_URL = os.getenv("JOPLIN_API_URL")
-TOKEN = os.getenv("JOPLIN_API_TOKEN")
+CONFIG_FILE = ".config/joplin-lite/settings.json"
 
 
 def test_joplin_connection():
     """Fetches and displays top-level notebooks from the local Joplin API."""
+    # Read server settings file
+    config_path = Path.home() / CONFIG_FILE
+    if not config_path.exists():
+        print(f"\nFAILED: Missing config file {config_path}.")
+        sys.exit(1)
+
+    config_dict = None
+    with open(config_path, "r", encoding="utf-8") as fp:
+        config_dict = json.load(fp)
+
+    api_port = config_dict.get("api.port", 41184)
+    api_token = config_dict.get("api.token")
+
+    BASE_URL = f"http://localhost:{api_port}"
+
     url = f"{BASE_URL}/folders"
-    params = {"token": TOKEN}
+    params = {"token": api_token}
 
     print(f"Connecting to Joplin API at {BASE_URL}...")
 
@@ -67,7 +77,7 @@ def test_joplin_connection():
             url = f"{BASE_URL}/folders/{main_folder_id}/notes"
             limit = 5
             params = {
-                "token": TOKEN,
+                "token": api_token,
                 "order_by": "updated_time",
                 "order_dir": "desc",
                 "limit": limit,
@@ -86,7 +96,7 @@ def test_joplin_connection():
         query = "Joplin"
         limit = 10
         params = {
-            "token": TOKEN,
+            "token": api_token,
             "query": query,
             "fields": "id,title,created_time,parent_id",
             "order_by": "updated_time",
