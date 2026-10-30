@@ -20,13 +20,7 @@ import webview
 from joplin_lite.api import Api
 from joplin_lite.platforms import setup_window_features
 
-from joplin_lite.joplin_server import (
-    start_server, wait_for_server, stop_server, get_api_credentials
-)
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("main")
-
+from joplin_lite.joplin_server import start_server, wait_for_server, get_api_credentials
 
 
 def get_target_window_size(scale=0.8):
@@ -44,14 +38,22 @@ def main() -> int:
     parser.add_argument("-d", "--debug", action="store_true", help="Open inspection panel.")
     args = parser.parse_args()
 
+    # Setup logger level
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
+
     # Start the joplin data/api server
+    joplin_port, joplin_token = get_api_credentials()
     _proc = start_server()
     ok = wait_for_server()
     if not ok:
         sys.exit(1)
 
     # Initialize pywebview API instance
-    api = Api()
+    api = Api(joplin_port, joplin_token)
 
     win_width, win_height = get_target_window_size(scale=0.8)
 

@@ -34,12 +34,14 @@ joplin --profile ~/.config/joplin-lite server stop
 
 ## 4. Edit the profile settings file to change the port number
 
-To avoid conflict with the terminal app, add a new field to the settings file at `$HOME/.config/joplin-lite/settings.json` to change the port number from the default (41184) to 41185. Add this element to the file, just before the "api.token" field:
+To avoid conflict with the terminal app, add a new field to the settings file at `$HOME/.config/joplin-lite/settings.json` to change the port number from the default (41184) to 41183. Add this element to the file, just before the "api.token" field:
 
 ```json
-"api.port": 41185,
+"api.port": 41183,
 
 ```
+
+Note: we originally used 44185, however, we want a port number **outside** the range used by other Joplin apps (41184 to 41185).
 
 ## 5. Check that the server is running
 
@@ -57,7 +59,7 @@ joplin --profile ~/.config/joplin-lite server status
 
 ```
 
-The command should return the message `Server is running on port 41185`
+The command should return the message `Server is running on port 41183`
 
 ## 6. [Optional] Configure synchronization with remote store
 

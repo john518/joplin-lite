@@ -4,6 +4,7 @@ import pywebvueLogo from '../assets/logo.svg'
 
 const count = ref(0)
 const apiStatus = ref("")
+const joplinFolders = ref("joplinFolders")
 
 async function checkApi() {
   try {
@@ -12,6 +13,17 @@ async function checkApi() {
     apiStatus.value = `${pong.status} at ${pong.timestamp}`
   } catch (error) {
     apiStatus.value = 'Error calling backend'
+    console.error(error)
+  }
+}
+
+async function getFolders() {
+  try {
+    joplinFolders.value = "Fetching folders"
+    const response = await window.pywebview.api.request("get", "/folders")
+    joplinFolders.value = response
+  } catch (error) {
+    joplinFolders.value = 'Error calling backend'
     console.error(error)
   }
 }
@@ -32,8 +44,12 @@ async function checkApi() {
     </div>
 
     <div>
-      <button type="button" @click="checkApi">Ping</button>
+      <button type="button" @click="getFolders">Ping</button>
       <span>API status: {{ apiStatus }}</span>
+    </div>
+
+    <div>
+      <span>{{ joplinFolders }} </span>
     </div>
 
   </div>

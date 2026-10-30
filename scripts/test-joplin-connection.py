@@ -34,7 +34,7 @@ def test_joplin_connection():
     with open(config_path, "r", encoding="utf-8") as fp:
         config_dict = json.load(fp)
 
-    api_port = config_dict.get("api.port", 41184)
+    api_port = config_dict.get("api.port", 41183)
     api_token = config_dict.get("api.token")
 
     BASE_URL = f"http://localhost:{api_port}"

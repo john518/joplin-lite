@@ -20,12 +20,13 @@ _active_process: subprocess.Popen | None = None
 logger = logging.getLogger("joplin_server")
 
 # Default paths and settings
-DEFAULT_CONFIG_PATH = Path.home() / ".config/joplin-lite/settings.json"
+JOPLIN_CONFIG_PATH = Path.home() / ".config/joplin-lite"
+JOPLIN_SETTINGS_FILEPATH = JOPLIN_CONFIG_PATH / "settings.json"
 DEFAULT_TIMEOUT = 15.0  # Seconds to wait for server to come online
 POLL_INTERVAL = 0.5     # Seconds between health check polls
 
 
-def get_server_config(config_path: Path = DEFAULT_CONFIG_PATH) -> dict[str, Any]:
+def get_server_config(config_path: Path = JOPLIN_SETTINGS_FILEPATH) -> dict[str, Any]:
     """
     Reads the Joplin settings file and extracts configuration values
     such as api.port and api.token.
@@ -43,14 +44,15 @@ def get_server_config(config_path: Path = DEFAULT_CONFIG_PATH) -> dict[str, Any]
         return {}
 
 
-def get_api_credentials(config_path: Path = DEFAULT_CONFIG_PATH) -> tuple[int | None, str | None]:
+def get_api_credentials(config_path: Path = JOPLIN_SETTINGS_FILEPATH) -> tuple[int | None, str | None]:
     """
     Convenience function to retrieve the configured API port and token.
     """
     config = get_server_config(config_path)
     # Adjust keys based on how Joplin structures its settings JSON
-    port = config.get("api.port") or config.get("port")
-    token = config.get("api.token") or config.get("token")
+    port = config.get("api.port")
+    token = config.get("api.token")
+    logger.info(f"Using config with api.port {port} and token starting {token[:16]}")
     return port, token
 
 
@@ -62,12 +64,12 @@ def check_server_status() -> bool:
     # 1. Try CLI check first
     try:
         result = subprocess.run(
-            ["joplin", "server", "status"],
+            ["joplin", "--profile", str(JOPLIN_CONFIG_PATH), "server", "status"],
             capture_output=True,
             text=True,
             timeout=3.0
         )
-        if result.returncode == 0 and "running" in result.stdout.lower():
+        if result.returncode == 0 and "is running" in result.stdout.lower():
             return True
     except (subprocess.SubprocessError, FileNotFoundError):
         pass
@@ -116,14 +118,22 @@ def start_server() -> subprocess.Popen | None:
         return None
 
     logger.info("Starting Joplin server...")
+
+    log_dir = Path.home() / ".local" / "share" / "joplin-lite"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "joplin_server.log"
+
     try:
-        # Adjust command as appropriate for your environment (e.g., node / CLI script)
+        log_file = open(log_path, "a", encoding="utf-8")
+        log_file.write("Starting Joplin server...\n")
+
         _active_process = subprocess.Popen(
-            ["joplin", "server", "start"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            ["joplin", "--profile", str(JOPLIN_CONFIG_PATH), "server", "start"],
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
             text=True
         )
+        logger.info(f"Joplin server started (PID: {_active_process.pid}), logging to {log_path}")
     except Exception as e:
         logger.error(f"Failed to start Joplin server: {e}")
         return None
@@ -153,13 +163,12 @@ def stop_server(process: subprocess.Popen | None = None) -> None:
     Stops the Joplin server. If a subprocess handle was kept from `start_server()`,
     it terminates it; otherwise, it attempts a CLI stop command.
     """
-    logger.info("Enter stop_server()")
     # Fallback to the module-level process if none is explicitly passed
     target_process = process or _active_process
 
     if target_process and target_process.poll() is None:
         logger.info("Stopping Joplin server subprocess...")
-        process.terminate()
+        target_process.terminate()
         try:
             target_process.wait(timeout=3)
         except subprocess.TimeoutExpired:
