@@ -1,7 +1,7 @@
 <template>
   <div v-if="!isReady" class="splash-screen">
     <div class="spinner-container">
-      <p>Starting {{ project_name }}...</p>
+      <p>Starting {{ projectName }}...</p>
     </div>
   </div>
   <HelloWorld v-else />
@@ -11,7 +11,7 @@
 import { ref, onMounted } from 'vue'
 import HelloWorld from './components/HelloWorld.vue'
 
-const project_name = ref("{{ cookiecutter.project_name }}")
+const projectName = ref("Joplin Lite")
 const isReady = ref(false)
 
 onMounted(async () => {
