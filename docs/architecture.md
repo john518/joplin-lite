@@ -17,6 +17,6 @@ The front end user interface is made up of custom Vue.js components:
 
 The backend will start the joplin data/api server and the webview with the frontend html file.
 
-- `main.py` has the entry point for launching the app. It's `main()` function will start the joplin data/api server and the webview frontend. 
+- `joplin-lite.py` has the entry point for launching the app. It's `main()` function will start the joplin data/api server and the webview frontend. 
 - `joplin-server.py` provides the actual management of and access to the joplin data/api server. Outside of this project, a new "joplin-lite" profile must be created and assigned an IP address outside the default Joplin range (41184-41194). The `joplin_server.py` has functions to read the profile settings file to obtain the port number and api token. The code also uses the `atexit` library to shut down the joplin data/api server.
 - `api.py` implements the Javascript/Python bridge that enables frontend code to call functions in the backend. Its main function is to forward http requests from the frontend to the joplin data/api server and return the response to the frontend.

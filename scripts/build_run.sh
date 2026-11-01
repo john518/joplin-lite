@@ -9,4 +9,4 @@ cd "$ROOT_DIR"
 npm --prefix ui run build
 
 # Run the python desktop application entry point
-PYTHONPATH=. ./.venv/bin/python -u joplin_lite/main.py "$@"
+PYTHONPATH=. ./.venv/bin/python -u joplin_lite/joplin-lite.py "$@"
