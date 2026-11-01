@@ -20,8 +20,8 @@ The primary objective is to use Joplin notes with a much smaller disk and memory
 
 - pywebview to start the Joplin Data/API server as a subprocess. Python will be used to invoke S3 synchronization.
 - Vue.js/Vite to provide the UI
-- The plan is to access the joplin server (data api) directly from javascript, and only use python for other actions (synchronization might be one).
-- Possibly mellisearch community edition for note search
+- The original plan was to access the joplin server (data api) directly from javascript, but because of CORS constraints, access will be relayed through the Python back end.
+- The Python backend might also be used for other utility operations (synchronization might be one).
 
 ## Deferred or Out of Scope Features
 
