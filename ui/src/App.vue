@@ -4,12 +4,12 @@
       <p>Starting {{ projectName }}...</p>
     </div>
   </div>
-  <HelloWorld v-else />
+  <Main v-else />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+import Main from './components/Main.vue'
 
 const projectName = ref("Joplin Lite")
 const isReady = ref(false)
