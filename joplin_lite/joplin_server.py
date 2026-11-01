@@ -106,7 +106,7 @@ def check_server_status() -> bool:
         return False
 
 
-def start_server() -> subprocess.Popen | None:
+def start_server(stop_on_exit: bool = True) -> subprocess.Popen | None:
     """
     Starts the Joplin server in the background as a subprocess
     if it is not already running.
@@ -138,8 +138,10 @@ def start_server() -> subprocess.Popen | None:
         logger.error(f"Failed to start Joplin server: {e}")
         return None
 
-    # Automatically register cleanup the first time we successfully start it
-    atexit.register(stop_server, _active_process)
+    if stop_on_exit:
+        # Automatically register cleanup the first time we successfully start it
+        atexit.register(stop_server, _active_process)
+
     return _active_process
 
 

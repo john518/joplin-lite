@@ -36,6 +36,8 @@ def main() -> int:
     """Initialize and start the joplin data/api server and pywebview desktop window."""
     parser = argparse.ArgumentParser(description="Starts the application")
     parser.add_argument("-d", "--debug", action="store_true", help="Open inspection panel.")
+    parser.add_argument("-k", "--keep-server-running", action="store_true",
+        help="Leave joplin data/api server running (for development)")
     args = parser.parse_args()
 
     # Setup logger level
@@ -47,7 +49,9 @@ def main() -> int:
 
     # Start the joplin data/api server
     joplin_port, joplin_token = get_api_credentials()
-    _proc = start_server()
+
+    stop_on_exit = not args.keep_server_running
+    _proc = start_server(stop_on_exit=stop_on_exit)
     ok = wait_for_server()
     if not ok:
         sys.exit(1)
