@@ -5,7 +5,20 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from datetime import datetime
+from enum import Enum
 from typing import Any
+
+from joplin_lite.utils import build_notebook_tree
+
+
+class HttpMethod(str, Enum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+    PATCH = "PATCH"
+    HEAD = "HEAD"
+    OPTIONS = "OPTIONS"
 
 
 class Api:
@@ -28,7 +41,7 @@ class Api:
 
     def request(
         self,
-        method: str,
+        method: HttpMethod,
         endpoint: str,
         data: dict[str, Any] | list[Any] | None = None,
         params: dict[str, Any] | None = None
@@ -87,3 +100,56 @@ class Api:
                 "status": 500,
                 "error": str(e)
             }
+
+    def get_notebooks(self) -> list[dict]:
+        """Fetches all notebooks from the Joplin API and formats them as a flattened list.
+
+        Returns:
+            list of dict: A flattened list of notebook dictionaries sorted hierarchically and
+            alphanumerically, with an added 'depth' integer field indicating the nesting level.
+        """
+        notebooks = self._fetch_all_notebooks()
+
+        # Skip notebooks that are in Trash folder
+        active_notebooks = [nb for nb in notebooks if nb.get("deleted_time", 0) == 0]
+
+        # Generate the flattened list
+        flattened = build_notebook_tree(active_notebooks)  # need to worry about empty case?
+        print("FLATTENED:")
+        print(flattened)
+        return flattened
+
+    def _fetch_all_notebooks(self) -> list[dict]:
+        """Fetches all notebooks from the Joplin API, handling pagination."""
+        page = 1
+        limit = 50
+        all_notebooks = []
+
+        while True:
+            params = {
+                "limit": limit,
+                "page": page
+            }
+            response = self.request(HttpMethod.GET, "folders", params)
+            error = response.get("error")
+            if error is not None:
+                raise RuntimeError(error)
+
+            data = response.get("data")
+            if not data:
+                break
+
+            items = data.get("items", response)
+            if not items:
+                break
+
+            all_notebooks.extend(items)
+
+            # Check if there are more pages
+            has_more = response.get("has_more", False)
+            if not has_more or len(items) < limit:
+                break
+
+            page += 1
+
+        return all_notebooks

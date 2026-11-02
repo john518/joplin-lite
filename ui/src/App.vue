@@ -27,6 +27,7 @@ onMounted(async () => {
           // await new Promise(resolve => setTimeout(resolve, 1000))  // for debug only
 
           isReady.value = true
+          await pywebview.api.get_notebooks()
           return
         }
       } catch (e) {
