@@ -115,8 +115,8 @@ class Api:
 
         # Generate the flattened list
         flattened = build_notebook_tree(active_notebooks)  # need to worry about empty case?
-        print("FLATTENED:")
-        print(flattened)
+        # print("FLATTENED:")
+        # print(flattened)
         return flattened
 
     def _fetch_all_notebooks(self) -> list[dict]:

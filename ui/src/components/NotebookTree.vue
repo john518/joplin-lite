@@ -1,12 +1,20 @@
 <template>
   <div class="stub-pane">
     <h3>Notebooks</h3>
-    <p class="placeholder-text">Tree view will go here.</p>
+
+    <ul>
+      <li v-for="notebook in state.notebooks" :key="notebook.id">
+        {{ notebook.title }}
+      </li>
+    </ul>
+
+
   </div>
 </template>
 
 <script setup>
-// Component logic will go here
+  import { useApplicationStore } from '../composables/useApplicationStore.js'
+  const { state } = useApplicationStore()
 </script>
 
 <style scoped>

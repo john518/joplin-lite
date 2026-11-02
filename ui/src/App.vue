@@ -9,6 +9,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+
+import { useApplicationStore } from './composables/useApplicationStore.js'
+const { setBackendReady } = useApplicationStore()
+
 import Main from './components/Main.vue'
 
 const projectName = ref("Joplin Lite")
@@ -25,9 +29,8 @@ onMounted(async () => {
         const response = await window.pywebview.api.ping()
         if (response && response.status === 'ok') {
           // await new Promise(resolve => setTimeout(resolve, 1000))  // for debug only
-
+          setBackendReady(true)
           isReady.value = true
-          await pywebview.api.get_notebooks()
           return
         }
       } catch (e) {
