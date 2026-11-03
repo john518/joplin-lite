@@ -20,7 +20,7 @@ const state = reactive({
 
 export function useApplicationStore() {
 
-  // 1. Control backend readiness and automatically trigger data loading
+  // Control backend readiness and automatically trigger data loading
   const setBackendReady = async (isReady) => {
     console.debug(`Enter setBackendReady(${isReady})`)
     if (isReady) {
@@ -28,7 +28,7 @@ export function useApplicationStore() {
     }
   }
 
-  // 2. Define the action to fetch notebooks via the pywebview bridge
+  // Define the action to fetch notebooks via the pywebview bridge
   const fetchNotebooks = async () => {
     try {
       // Calls your Python backend function exposed via pywebview
@@ -37,9 +37,49 @@ export function useApplicationStore() {
       console.error("Error fetching notebooks:", error)
     }
   }
+
+  // Selects a notebook by ID, saves the preference locally, and fetches its notes.
+  //   * @param {number|string} notebookId - The ID of the notebook, or 0 for "All Notes".
+  const selectNotebook = async (notebookId) => {
+    state.selectedNotebookId = notebookId
+    state.selectedNoteId = null // Clear note selection when switching notebooks
+
+    // Persist to pywebview client storage
+    // try {
+    //   await window.pywebview.storage.set('selectedNotebookId', notebookId)
+    // } catch (e) {
+    //   console.warn("Failed to persist selectedNotebookId to storage:", e)
+    // }
+
+    // Fetch notes based on whether "All" or a specific notebook is chosen
+    console.log(`TODO fetchNotesForNotebook(${notebookId})`)
+    // await fetchNotesForNotebook(notebookId)
+  }
+
+  const fetchNotesForNotebook = async (notebookId) => {
+    try {
+      let endpoint = '/notes'
+      let params = { limit: 100, order_by: 'updated_time', order_dir: 'DESC' }
+
+      // If a specific notebook is selected (not 'All' / 0), filter by parent_id
+      if (notebookId !== 0) {
+        // Depending on your backend API route design, you can pass a query filter
+        // or a specific endpoint path like `/notebooks/${notebookId}/notes`
+        params.parent_id = notebookId
+      }
+
+      const response = await window.pywebview.api.api_request(endpoint, 'GET', params)
+      if (response.success) {
+        state.notes = response.data.items || []
+      }
+    } catch (error) {
+      console.error("Error fetching notes for notebook:", error)
+    }
+  }
+
   return {
     state,
     setBackendReady,
-    fetchNotebooks,
+    selectNotebook,
   }
 }
