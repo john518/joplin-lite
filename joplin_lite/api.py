@@ -4,6 +4,7 @@ import json
 import urllib.request
 import urllib.error
 import urllib.parse
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -23,6 +24,23 @@ class HttpMethod(str, Enum):
     PATCH = "PATCH"
     HEAD = "HEAD"
     OPTIONS = "OPTIONS"
+
+
+@dataclass
+class ResponseObject:
+    success: bool
+    status: int
+    data: dict = field(default_factory=dict)
+    err_data: dict | str | None = None
+
+
+@dataclass
+class NotesObject:
+    """Data returned by get_notes()"""
+    success: bool
+    items: list[dict]
+    has_more: bool
+    error_data: dict | str | None = None
 
 
 class Api:
@@ -49,7 +67,7 @@ class Api:
         endpoint: str,
         data: dict[str, Any] | list[Any] | None = None,
         params: dict[str, Any] | None = None
-    ) -> dict[str, Any]:
+    ) -> ResponseObject:
         """
         Generic request forwarder callable from JavaScript via pywebview.api.request(...)
         """
@@ -79,11 +97,7 @@ class Api:
                 except json.JSONDecodeError:
                     parsed_data = res_body
 
-                return {
-                    "success": True,
-                    "status": response.status,
-                    "data": parsed_data
-                }
+                return ResponseObject(success=True, status=response.status, data=parsed_data)
 
         except urllib.error.HTTPError as e:
             err_body = e.read().decode("utf-8")
@@ -92,18 +106,10 @@ class Api:
             except json.JSONDecodeError:
                 err_data = err_body
 
-            return {
-                "success": False,
-                "status": e.code,
-                "error": err_data
-            }
+            return ResponseObject(success=False, status=e.code, data=None, err_data=err_data)
 
         except Exception as e:
-            return {
-                "success": False,
-                "status": 500,
-                "error": str(e)
-            }
+            return ResponseObject(success=False, status=500, data=None, err_data=str(e))
 
     def get_notebooks(self) -> list[dict]:
         """Fetches all notebooks from the Joplin API and formats them as a flattened list.
@@ -135,28 +141,55 @@ class Api:
                 "page": page
             }
             response = self.request(HttpMethod.GET, "folders", params)
-            error = response.get("error")
-            if error is not None:
-                raise RuntimeError(error)
+            err_data = response.err_data
+            if err_data is not None:
+                raise RuntimeError(err_data)
 
-            data = response.get("data")
-            if not data:
+            if not response.data:
                 break
 
-            items = data.get("items", response)
+            if not response.data:
+                break
+
+            items = response.data.get("items", [])
             if not items:
                 break
 
             all_notebooks.extend(items)
 
             # Check if there are more pages
-            has_more = response.get("has_more", False)
+            has_more = response.data.get("has_more", False)
             if not has_more or len(items) < limit:
                 break
 
             page += 1
 
         return all_notebooks
+
+    def get_notes(self, notebook_id: str, page: int = 1, limit: int = 50) -> NotesObject:
+        """Fetches notes from the Joplin API for specified notebook.
+
+        Note that `notebook_id` 0 represents all notes
+        """
+        endpoint = "notes" if notebook_id == 0 else f"folders/{notebook_id}/notes"
+        params = {
+            "limit": limit,
+            "page": page,
+            "include_conflicts": 1,
+            "order_by": "updated_time",
+            "order_dir": "desc",
+        }
+
+        response = self.request(HttpMethod.GET, endpoint, params)
+
+        if response.err_data:
+            return NotesObject(
+                success=False, items=[], has_more=False, error_data=response.err_data)
+
+        # (else)
+        data = response.data
+        return NotesObject(
+            success=True, items=data.get("items", []), has_more=data.get("has_more", False))
 
     def get_user_state(self):
         """Retrieves the full user state dictionary from disk."""
