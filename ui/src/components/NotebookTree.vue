@@ -26,8 +26,11 @@
   const { state, selectNotebook } = useApplicationStore()
 
   const handleNotebookClick = (id) => {
-    console.debug(`Selected notebook ${id}`)
-    selectNotebook(id)
+    // Update if the clicked notebook is not currently selected
+    if (id !== state.selectedNotebookId) {
+      console.debug(`Selected notebook ${id}`)
+      selectNotebook(id)
+    }
   }
 </script>
 
