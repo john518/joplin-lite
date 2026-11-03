@@ -24,9 +24,21 @@ export function useApplicationStore() {
   const setBackendReady = async (isReady) => {
     console.debug(`Enter setBackendReady(${isReady})`)
     if (isReady) {
-      await fetchNotebooks() // Automatically load data the moment the backend is confirmed
-    }
-  }
+      try {
+         // Automatically load data once the backend is confirmed
+        await fetchNotebooks()
+
+        // Select notebook from persistent store
+        const res = await window.pywebview.api.get_user_state_value('selectedNotebookId')
+        if (res.success && res.value !== null) {
+          state.selectedNotebookId = res.value
+        }  // if
+      }  // try
+      catch (e) {
+        console.warn("Failed to initialize data:", e)
+      }  // catch
+    }  // if (isReady)
+  }  // setBackendReady
 
   // Define the action to fetch notebooks via the pywebview bridge
   const fetchNotebooks = async () => {
@@ -44,12 +56,12 @@ export function useApplicationStore() {
     state.selectedNotebookId = notebookId
     state.selectedNoteId = null // Clear note selection when switching notebooks
 
-    // Persist to pywebview client storage
-    // try {
-    //   await window.pywebview.storage.set('selectedNotebookId', notebookId)
-    // } catch (e) {
-    //   console.warn("Failed to persist selectedNotebookId to storage:", e)
-    // }
+    // Update persistent storage
+    try {
+      await window.pywebview.api.save_user_state_value('selectedNotebookId', notebookId)
+    } catch (e) {
+      console.warn("Failed to persist selectedNotebookId to storage:", e)
+    }
 
     // Fetch notes based on whether "All" or a specific notebook is chosen
     console.log(`TODO fetchNotesForNotebook(${notebookId})`)

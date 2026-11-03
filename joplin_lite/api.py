@@ -6,9 +6,13 @@ import urllib.error
 import urllib.parse
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 from joplin_lite.utils import build_notebook_tree
+
+
+STATE_FILE = Path.home() / ".config" / "joplin-lite" / "state.json"
 
 
 class HttpMethod(str, Enum):
@@ -153,3 +157,31 @@ class Api:
             page += 1
 
         return all_notebooks
+
+    def get_user_state(self):
+        """Retrieves the full user state dictionary from disk."""
+        if STATE_FILE.exists():
+            try:
+                with open(STATE_FILE, "r") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def get_user_state_value(self, key):
+        """Retrieves a specific value from the saved user state."""
+        state = self.get_user_state()
+        return {"success": True, "value": state.get(key)}
+
+    def save_user_state_value(self, key, value):
+        """Saves a single key-value preference to the state file."""
+        try:
+            STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            state = self.get_user_state()
+            state[key] = value
+
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
