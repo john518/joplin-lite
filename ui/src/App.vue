@@ -1,10 +1,13 @@
 <template>
-  <div v-if="!isReady" class="splash-screen">
-    <div class="spinner-container">
-      <p>Starting {{ projectName }}...</p>
+    <!-- Splash screen hidden via CSS when ready -->
+    <div v-show="!isReady" class="splash-screen">
+      <div class="spinner-container">
+        <p>Starting {{ projectName }}...</p>
+      </div>
     </div>
-  </div>
-  <Main v-else />
+
+    <!-- Main component is rendered immediately in the background -->
+    <Main v-show="isReady" />
 </template>
 
 <script setup>
