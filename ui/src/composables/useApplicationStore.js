@@ -11,7 +11,6 @@
 import { reactive, computed } from 'vue'
 
 const state = reactive({
-  backendReady: false,
   notebooks: [],
   notes: [],
   selectedNotebookId: null,
@@ -23,8 +22,7 @@ export function useApplicationStore() {
 
   // 1. Control backend readiness and automatically trigger data loading
   const setBackendReady = async (isReady) => {
-    console.debug("Enter setBackendReady()")
-    state.backendReady = isReady
+    console.debug(`Enter setBackendReady(${isReady})`)
     if (isReady) {
       await fetchNotebooks() // Automatically load data the moment the backend is confirmed
     }

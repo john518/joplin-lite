@@ -11,7 +11,7 @@ The front end user interface is made up of custom Vue.js components:
 - `NotebookTree.vue` is the first column, showing a tree view of the user's notebooks.
 - `NoteList.vue` is the middle column, showing a list of note titles for the selected notebook or "all". The component will provide limit ed sorting options. By default, notes are sorted by updated datetime in descending order.
 - `NoteEditor.vue` is the last column, showing the current selected note (if any) for editing
-- `useApplicationState.js` implements a Vue composable to serve as a centralized reactive state across all components, via the Vue `provide/inject` pattern. State data will include a boolean `backendReady` variable, the notebook list/tree, the selected notebook id, the current note list, the selected note if, and a list of the recently-visited note history.
+- `useApplicationStore.js` implements a Vue composable to serve as a centralized reactive state across all components, via the Vue `provide/inject` pattern. State data includes the notebook list/tree, the selected notebook id, the current note list, the selected note if, and a list of the recently-visited note history.
 
 ## Back End
 
