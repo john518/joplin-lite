@@ -68,34 +68,18 @@ export function useApplicationStore() {
     try {
       await window.pywebview.api.save_user_state_value('selectedNotebookId', notebookId)
     } catch (e) {
-      console.warn("Failed to persist selectedNotebookId to storage:", e)
+      console.error("Failed to persist selectedNotebookId to storage:", e)
     }
 
-    // Fetch notes based on whether "All" or a specific notebook is chosen
-    console.debug(`Fetching notes for notebook(${notebookId})`)
-    const notesObject = await window.pywebview.api.get_notes(state.selectedNotebookId)
-    // console.dir(notesObject)
-    state.notes = notesObject.items
-  }
-
-  const fetchNotesForNotebook = async (notebookId) => {
+    // Fetch notes for selected notebook
     try {
-      let endpoint = '/notes'
-      let params = { limit: 100, order_by: 'updated_time', order_dir: 'DESC' }
-
-      // If a specific notebook is selected (not 'All' / 0), filter by parent_id
-      if (notebookId !== 0) {
-        // Depending on your backend API route design, you can pass a query filter
-        // or a specific endpoint path like `/notebooks/${notebookId}/notes`
-        params.parent_id = notebookId
-      }
-
-      const response = await window.pywebview.api.api_request(endpoint, 'GET', params)
-      if (response.success) {
-        state.notes = response.data.items || []
-      }
-    } catch (error) {
-      console.error("Error fetching notes for notebook:", error)
+      console.debug(`Fetching notes for notebook(${notebookId})`)
+      const notesObject = await window.pywebview.api.get_notes(state.selectedNotebookId)
+      // console.dir(notesObject)
+      state.notes = notesObject.items
+    }
+    catch (e) {
+      console.error(`Failed to fetch notes for notebook ${notebookId}`, e)
     }
   }
 

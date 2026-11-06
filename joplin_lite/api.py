@@ -214,13 +214,14 @@ class Api:
             }
 
         # (else)
-        logger.debug(f"Returning note data: {response.data}")
+        # logger.debug(f"Returning note data: {response.data}")
         return {
             "success": True,
             "data": response.data,
         }
 
 
+    # These last methods are for saving/restoring the current notebook and note between sessions
     def get_user_state(self):
         """Retrieves the full user state dictionary from disk."""
         if STATE_FILE.exists():
