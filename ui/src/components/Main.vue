@@ -83,7 +83,7 @@ const initResize = (colIndex, event) => {
 
 .note-list-col {
   flex-shrink: 0;
-  background-color: #2d2d2d;
+  /*background-color: #2d2d2d;*/
   /*border-right: 1px solid #333333;*/
   background-color: var(--bg-column-notelist);
   border-right: 1px solid var(--app-border);

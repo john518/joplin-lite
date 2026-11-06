@@ -48,12 +48,13 @@ ul {
 li {
   /* Add padding, hover states, and cursor pointer here */
   cursor: pointer;
+  padding-left: 8px;
   padding-top: 8px;
   font-size: 11pt;
 }
 
 /* Active state with Joplin-style blue background */
-li.active {
+li.active > span {
   background-color: #094771; /* Classic VS Code / Joplin active selection blue */
   color: #ffffff;
 }
@@ -68,6 +69,16 @@ ul li {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  padding: 0;
+  padding-left: 6px;
+  padding-top: 8px;
+}
+
+hr {
+  margin: 0;
+  /*background-color: #333333;*/
+
 }
 
 </style>
