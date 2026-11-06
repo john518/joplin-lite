@@ -178,7 +178,7 @@ class Api:
         params = {
             "limit": limit,
             "page": page,
-            "fields": "id,title,updated_time",
+            # "fields": "id,title,updated_time",
             "include_conflicts": 1,
             "order_by": "updated_time",
             "order_dir": "desc",

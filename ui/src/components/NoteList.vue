@@ -7,7 +7,7 @@
         @click="handleNoteClick(note.id)"
         :class="{ active: state.selectedNoteId === note.id}"
       >
-        {{ note.title }} {{ formatDate(note) }} <hr />
+        {{ note.title }} <hr />
       </li>
     </ul>
   </div>
@@ -24,17 +24,6 @@
       // selectNote(id)
     }
   }  // handleNoteClick
-
-  const formatDate = (note) => {
-    return new Date(note.updated_time).toLocaleString()
-  }
-
-//   computed: {
-//     formattedTime(note) {
-//       return new Date(note.updated_time).toLocaleString()
-//     }  // formattedTime
-//
-//   }  // computed
 </script>
 
 <style scoped>

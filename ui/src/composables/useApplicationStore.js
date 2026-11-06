@@ -73,7 +73,7 @@ export function useApplicationStore() {
     // Fetch notes based on whether "All" or a specific notebook is chosen
     console.debug(`Fetching notes for notebook(${notebookId})`)
     const notesObject = await window.pywebview.api.get_notes(state.selectedNotebookId)
-    console.dir(notesObject)
+    // console.dir(notesObject)
     state.notes = notesObject.items
   }
 
