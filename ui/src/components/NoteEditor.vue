@@ -1,12 +1,13 @@
 <template>
   <div class="stub-pane">
-    <h3>Note Editor</h3>
-    <p class="placeholder-text">Markdown editing pane will go here.</p>
+    <h3>{{state.currentNote.title}}</h3>
+    <div>{{ state.currentNote.body }}</div>
   </div>
 </template>
 
 <script setup>
-// Component logic will go here
+  import { useApplicationStore } from '../composables/useApplicationStore.js'
+  const { state } = useApplicationStore()
 </script>
 
 <style scoped>
@@ -16,7 +17,7 @@
 h3 {
   margin-top: 0;
   font-size: 14px;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   letter-spacing: 0.05em;
   color: #858585;
 }

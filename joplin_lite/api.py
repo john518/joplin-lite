@@ -197,6 +197,30 @@ class Api:
         return asdict(NotesObject(
             success=True, items=data.get("items", []), has_more=data.get("has_more", False)))
 
+
+    def get_note(self, note_id: str) -> dict:
+        """Fetches note content from the Joplin API."""
+        endpoint = f"notes/{note_id}"
+        params = {
+            "fields": "id,title,body,created_time,updated_time",
+        }
+        response = self.request(HttpMethod.GET, endpoint, params=params)
+
+        if response.err_data:
+            logger.error(f"Returning {response.err_data=}")
+            return {
+                "success": False,
+                "error_data": response.err_data,
+            }
+
+        # (else)
+        logger.debug(f"Returning note data: {response.data}")
+        return {
+            "success": True,
+            "data": response.data,
+        }
+
+
     def get_user_state(self):
         """Retrieves the full user state dictionary from disk."""
         if STATE_FILE.exists():

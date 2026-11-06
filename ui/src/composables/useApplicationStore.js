@@ -13,6 +13,7 @@ import { reactive, computed } from 'vue'
 const state = reactive({
   notebooks: [],
   notes: [],
+  currentNote: null,
   selectedNotebookId: null,
   selectedNoteId: null,
   noteHistory: []
@@ -111,10 +112,10 @@ export function useApplicationStore() {
     }
 
     // Fetch note content
-    // console.debug(`Fetching note(${noteId})`)
-    // const note = await window.pywebview.api.get_note(state.selectedNoteId)
+    console.debug(`Fetching note(${noteId})`)
+    const noteResponse = await window.pywebview.api.get_note(state.selectedNoteId)
     // console.dir(note)
-    // state.notes = notesObject.items
+    state.currentNote = noteResponse.data
   }
 
   return {
