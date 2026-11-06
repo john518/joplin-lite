@@ -7,7 +7,8 @@
         @click="handleNoteClick(note.id)"
         :class="{ active: state.selectedNoteId === note.id}"
       >
-        {{ note.title }} <hr />
+        <span class="note-title">{{ note.title }}</span>
+        <hr />
       </li>
     </ul>
   </div>
@@ -55,6 +56,18 @@ li {
 li.active {
   background-color: #094771; /* Classic VS Code / Joplin active selection blue */
   color: #ffffff;
+}
+
+/* Ensure the list item constrains its children */
+ul li {
+  overflow: hidden;
+}
+
+.note-title {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 </style>
