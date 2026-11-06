@@ -1,10 +1,11 @@
 """Functions accessible to javascript via the pywebview Python-JS bridge."""
 
 import json
+import logging
 import urllib.request
 import urllib.error
 import urllib.parse
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -12,6 +13,7 @@ from typing import Any
 
 from joplin_lite.utils import build_notebook_tree
 
+logger = logging.getLogger("joplin_server")
 
 STATE_FILE = Path.home() / ".config" / "joplin-lite" / "state.json"
 
@@ -169,27 +171,31 @@ class Api:
     def get_notes(self, notebook_id: str, page: int = 1, limit: int = 50) -> NotesObject:
         """Fetches notes from the Joplin API for specified notebook.
 
-        Note that `notebook_id` 0 represents all notes
+        - `notebook_id` 0 represents all notes
+        - data are ordered by update_time descending
         """
         endpoint = "notes" if notebook_id == 0 else f"folders/{notebook_id}/notes"
         params = {
             "limit": limit,
             "page": page,
+            "fields": "id,title,updated_time",
             "include_conflicts": 1,
             "order_by": "updated_time",
             "order_dir": "desc",
         }
 
-        response = self.request(HttpMethod.GET, endpoint, params)
+        response = self.request(HttpMethod.GET, endpoint, params=params)
 
         if response.err_data:
-            return NotesObject(
-                success=False, items=[], has_more=False, error_data=response.err_data)
+            logger.error(f"Returning {response.err_data=}")
+            return asdict(NotesObject(
+                success=False, items=[], has_more=False, error_data=response.err_data))
 
         # (else)
         data = response.data
-        return NotesObject(
-            success=True, items=data.get("items", []), has_more=data.get("has_more", False))
+        logger.debug(f"Returning {len(data.get('items'))} items")
+        return asdict(NotesObject(
+            success=True, items=data.get("items", []), has_more=data.get("has_more", False)))
 
     def get_user_state(self):
         """Retrieves the full user state dictionary from disk."""

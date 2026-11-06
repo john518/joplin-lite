@@ -1,16 +1,44 @@
 <template>
-  <div class="stub-pane">
+  <div class="pane">
     <h3>Notes</h3>
-    <p class="placeholder-text">Note list view will go here.</p>
+
+    <ul>
+      <li v-for="note in state.notes" :key="note.id"
+        @click="handleNoteClick(note.id)"
+        :class="{ active: state.selectedNoteId === note.id}"
+      >
+        {{ note.title }} {{ formatDate(note) }} <hr />
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-// Component logic will go here
+  import { useApplicationStore } from '../composables/useApplicationStore.js'
+  const { state, selectNote } = useApplicationStore()
+
+  const handleNoteClick = (id) => {
+    // Update if the clicked notebook is not currently selected
+    if (id !== state.selectedNoteId) {
+      console.debug(`Selected note ${id}`)
+      // selectNote(id)
+    }
+  }  // handleNoteClick
+
+  const formatDate = (note) => {
+    return new Date(note.updated_time).toLocaleString()
+  }
+
+//   computed: {
+//     formattedTime(note) {
+//       return new Date(note.updated_time).toLocaleString()
+//     }  // formattedTime
+//
+//   }  // computed
 </script>
 
 <style scoped>
-.stub-pane {
+.pane {
   padding: 16px;
 }
 h3 {
@@ -20,8 +48,24 @@ h3 {
   letter-spacing: 0.05em;
   color: #858585;
 }
-.placeholder-text {
-  font-size: 13px;
-  color: #6a9955;
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
 }
+
+li {
+  /* Add padding, hover states, and cursor pointer here */
+  cursor: pointer;
+  padding-top: 8px;
+  font-size: 11pt;
+}
+
+/* Active state with Joplin-style blue background */
+li.active {
+  background-color: #094771; /* Classic VS Code / Joplin active selection blue */
+  color: #ffffff;
+}
+
 </style>

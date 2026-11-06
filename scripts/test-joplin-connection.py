@@ -91,6 +91,7 @@ def test_joplin_connection():
                 "order_by": "updated_time",
                 "order_dir": "desc",
                 "limit": limit,
+                "fields": "id,title,created_time,updated_time",
             }
 
             response = requests.get(url, params=params, timeout=5)
