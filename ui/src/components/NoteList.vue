@@ -22,7 +22,7 @@
     // Update if the clicked notebook is not currently selected
     if (id !== state.selectedNoteId) {
       console.debug(`Selected note ${id}`)
-      // selectNote(id)
+      selectNote(id)
     }
   }  // handleNoteClick
 </script>

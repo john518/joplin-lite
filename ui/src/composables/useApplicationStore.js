@@ -98,9 +98,29 @@ export function useApplicationStore() {
     }
   }
 
+  // Selects a note by ID, saves the preference locally, and fetches its contents.
+  //   * @param {number|string} notebookId - The ID of the notebook, or 0 for "All Notes".
+  const selectNote = async (noteId) => {
+    state.selectedNoteId = noteId
+
+    // Update persistent storage
+    try {
+      await window.pywebview.api.save_user_state_value('selectedNoteId', noteId)
+    } catch (e) {
+      console.warn("Failed to persist selectedNoteId to storage:", e)
+    }
+
+    // Fetch note content
+    // console.debug(`Fetching note(${noteId})`)
+    // const note = await window.pywebview.api.get_note(state.selectedNoteId)
+    // console.dir(note)
+    // state.notes = notesObject.items
+  }
+
   return {
     state,
     setBackendReady,
     selectNotebook,
+    selectNote,
   }
 }
