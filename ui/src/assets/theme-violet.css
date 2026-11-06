@@ -1,0 +1,23 @@
+/* src/assets/theme.css */
+/* Color scheme picked for modest contrast with Joplin's gray scheme */
+:root {
+  /* Choose your base accent color */
+  --app-primary: #7C4DFF;       /* Deep Electric Purple (or #A23B58 for Maroon) */
+  --app-primary-hover: #9D65FF; /* Lighter hover state */
+  --app-text-link: #B388FF;     /* High contrast link color */
+
+    /* --- Column Background Hierarchy --- */
+    /* Column 1: Leftmost Notebook / Folder Tree (Darkest, subtle deep purple-tinted charcoal) */
+    --bg-column-notebooks: #18131E;
+
+    /* Column 2: Middle Note List (Slightly lighter, neutral charcoal with a cool plum undertone) */
+    --bg-column-notelist: #201A28;
+
+    /* Column 3: Main Note Editor & Viewing Area (Lightest surface for maximum reading contrast) */
+    --bg-column-editor: #272130;
+
+    /* --- Text & Borders --- */
+    --app-text-main: #E2E1E8;        /* Soft off-white for editor body text */
+    --app-text-muted: #A099B0;       /* Muted text for counts, dates, subheaders */
+    --app-border: #362D42;           /* Subtle vertical dividers between columns */
+}

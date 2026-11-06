@@ -1,0 +1,22 @@
+/* src/assets/theme.css */
+:root {
+  /* --- Primary Accent System (Maroon / Burgundy) --- */
+  --app-primary: #A23B58;          /* Rich Crimson / Burgundy (Selection / Buttons) */
+  --app-primary-hover: #C24B6E;    /* Lighter hover highlight */
+  --app-text-link: #FF80AB;        /* High-contrast warm rose link color */
+
+  /* --- Column Background Hierarchy --- */
+  /* Column 1: Leftmost Notebook / Folder Tree (Darkest, deep mahogany/black-plum) */
+  --bg-column-notebooks: #1B1115;
+
+  /* Column 2: Middle Note List (Slightly lighter, neutral dark charcoal with maroon tint) */
+  --bg-column-notelist: #24171D;
+
+  /* Column 3: Main Note Editor & Viewing Area (Lightest surface for reading contrast) */
+  --bg-column-editor: #2D1D24;
+
+  /* --- Text & Borders --- */
+  --app-text-main: #EAE1E4;        /* Soft warm off-white for editor text */
+  --app-text-muted: #B09AA2;       /* Muted text for counts, dates, subheaders */
+  --app-border: #422934;           /* Subtle vertical dividers between columns */
+}

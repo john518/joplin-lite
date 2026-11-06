@@ -52,11 +52,50 @@ onMounted(async () => {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #f8fafc;
   color: #475569;
   font-family: inherit;
   font-size: 1.1rem;
+}
+</style>
+
+<style>
+/* --- Global Element Defaults (Unscoped) --- */
+body {
+  background-color: var(--bg-column-notebooks);
+  color: var(--app-text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global Link Styles */
+a {
+  color: var(--app-text-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  filter: brightness(1.2);
+}
+
+/* Global Scrollbar Tweaks for Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--app-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--app-primary);
 }
 </style>

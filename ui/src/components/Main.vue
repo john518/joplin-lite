@@ -76,18 +76,24 @@ const initResize = (colIndex, event) => {
 .notebook-tree-col {
   flex-shrink: 0;
   background-color: #252526;
-  border-right: 1px solid #333333;
+  /*border-right: 1px solid #333333;*/
+  background-color: var(--bg-column-notebooks);
+  border-right: 1px solid var(--app-border);
 }
 
 .note-list-col {
   flex-shrink: 0;
   background-color: #2d2d2d;
-  border-right: 1px solid #333333;
+  /*border-right: 1px solid #333333;*/
+  background-color: var(--bg-column-notelist);
+  border-right: 1px solid var(--app-border);
 }
 
 .note-editor-col {
   flex-grow: 1;
-  background-color: #1e1e1e;
+  /*background-color: #1e1e1e;*/
+  background-color: var(--bg-column-editor);
+  color: var(--app-text-main);
 }
 
 .resizer {
