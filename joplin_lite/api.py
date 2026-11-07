@@ -175,6 +175,7 @@ class Api:
         - `notebook_id` 0 represents all notes
         - data are ordered by update_time descending
         """
+        # logger.debug(f"Enter get_notes(${notebook_id=})")
         endpoint = "notes" if notebook_id == "all" else f"folders/{notebook_id}/notes"
         params = {
             "limit": limit,
@@ -201,6 +202,7 @@ class Api:
 
     def get_note(self, note_id: str) -> dict:
         """Fetches note content from the Joplin API."""
+        # logger.debug(f"Enter get_note({note_id=})")
         endpoint = f"notes/{note_id}"
         params = {
             "fields": "id,title,body,created_time,updated_time",

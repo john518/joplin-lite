@@ -33,12 +33,15 @@ export function useApplicationStore() {
         const notebookRes = await window.pywebview.api.get_user_state_value('selectedNotebookId')
         if (notebookRes.success && notebookRes.value !== null) {
           state.selectedNotebookId = notebookRes.value
+          fetchNotes(notebookRes.value)
         }
 
         // Set selected note from persistent store
         const noteRes = await window.pywebview.api.get_user_state_value('selectedNoteId')
         if (noteRes.success && noteRes.value !== null) {
           state.selectedNoteId = noteRes.value
+          // console.debug(`In setBackendReady(), selectedNoteId ${noteRes.value}`)
+          fetchNote(noteRes.value)
         }
 
       }  // try
@@ -50,6 +53,7 @@ export function useApplicationStore() {
 
   // Fetches notebooks via the pywebview bridge
   const fetchNotebooks = async () => {
+    console.debug("Fetching notebooks")
     try {
       // Calls your Python backend function exposed via pywebview
       state.notebooks = await window.pywebview.api.get_notebooks()
@@ -71,6 +75,11 @@ export function useApplicationStore() {
       console.error("Failed to persist selectedNotebookId to storage:", e)
     }
 
+    fetchNotes(notebookId)
+  }
+
+  // Fetches note list from pywebview bridge
+  const fetchNotes = async (notebookId) => {
     // Fetch notes for selected notebook
     try {
       console.debug(`Fetching notes for notebook(${notebookId})`)
@@ -93,11 +102,17 @@ export function useApplicationStore() {
       await window.pywebview.api.save_user_state_value('selectedNoteId', noteId)
     } catch (e) {
       console.warn("Failed to persist selectedNoteId to storage:", e)
+      // Retrieve note title and body from Joplin
     }
 
-    // Fetch note content
+    // Get the note title and body
+    fetchNote(noteId)
+  }
+
+  // Fetches note contents from pywebview bridge
+  const fetchNote = async(noteId) => {
     console.debug(`Fetching note(${noteId})`)
-    const noteResponse = await window.pywebview.api.get_note(state.selectedNoteId)
+    const noteResponse = await window.pywebview.api.get_note(noteId)
     // console.dir(note)
     state.currentNote = noteResponse.data
   }
