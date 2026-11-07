@@ -9,12 +9,14 @@
       />
       <div class="tabs">
         <button
+          tabindex="-1"
           :class="{ active: activeTab === 'write' }"
           @click="activeTab = 'write'"
         >
           Write
         </button>
         <button
+          tabindex="-1"
           :class="{ active: activeTab === 'preview' }"
           @click="activeTab = 'preview'"
         >
