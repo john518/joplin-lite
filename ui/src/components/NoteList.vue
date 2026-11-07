@@ -137,6 +137,21 @@ ul li {
   overflow: hidden;
 }
 
+/* Even rows: slight lift against your #201A28 background */
+li:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.035);
+}
+
+/* Odd rows: blends seamlessly into the column background[cite: 1] */
+li:nth-child(odd) {
+  background-color: transparent;
+}
+
+/* Hover state using your global theme primary accent */
+li:hover {
+  background-color: rgba(124, 77, 255, 0.15); /* 15% opacity of --app-primary */
+}
+
 .note-title {
   display: block;
   white-space: nowrap;
