@@ -1,5 +1,7 @@
 # Joplin Server Setup
 
+==> **THE MOST CURRENT INFO IS IN THE PROJECT README.md FILE** <==
+
 The Joplin Lite application connects to Joplin through the same backend as the Joplin Desktop and Terminal applications. It is called the Joplin Data/API server. So to use Joplin Lite, you must install Joplin.
 
 - You do NOT need to install the full Joplin Desktop application, which is built on the Electron platform and has a heavy memory and storage footprint.
