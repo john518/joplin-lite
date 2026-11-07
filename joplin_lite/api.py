@@ -175,7 +175,7 @@ class Api:
         - `notebook_id` 0 represents all notes
         - data are ordered by update_time descending
         """
-        endpoint = "notes" if notebook_id == 0 else f"folders/{notebook_id}/notes"
+        endpoint = "notes" if notebook_id == "all" else f"folders/{notebook_id}/notes"
         params = {
             "limit": limit,
             "page": page,
@@ -188,13 +188,13 @@ class Api:
         response = self.request(HttpMethod.GET, endpoint, params=params)
 
         if response.err_data:
-            logger.error(f"Returning {response.err_data=}")
+            logger.error(f"Returning {response.err_data=} for notebook {notebook_id}")
             return asdict(NotesObject(
                 success=False, items=[], has_more=False, error_data=response.err_data))
 
         # (else)
         data = response.data
-        logger.debug(f"Returning {len(data.get('items'))} items")
+        logger.debug(f"Returning {len(data.get('items'))} items for notebook {notebook_id}")
         return asdict(NotesObject(
             success=True, items=data.get("items", []), has_more=data.get("has_more", False)))
 
