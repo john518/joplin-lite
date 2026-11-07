@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from . import JOPLIN_PROFILE_PATH
+from joplin_lite.sync_manager import SyncManager
 from joplin_lite.utils import build_notebook_tree
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,9 @@ class Api:
         self.port = port
         self.token = token
         self.base_url = f"http://localhost:{port}"
+
+        # Initialize sync manager instance
+        self.sync_manager = SyncManager()
 
     def ping(self) -> dict:
         """Health check pywebview endpoint to verify backend is responsive."""
@@ -261,6 +265,16 @@ class Api:
             "success": True,
             "data": response.data,
         }
+
+
+    # Synchronization methods
+    def trigger_sync(self) -> dict:
+        """Expose sync trigger to JavaScript frontend via pywebview."""
+        return self.sync_manager.trigger_sync()
+
+    def get_sync_status(self) -> dict:
+        """Expose sync status check to JavaScript frontend via pywebview."""
+        return self.sync_manager.get_status()
 
 
 

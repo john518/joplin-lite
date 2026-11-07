@@ -8,7 +8,7 @@
  * @returns {Object} The reactive application state and state-mutation methods.
  */
 
-import { reactive, computed } from 'vue'
+import { reactive, readonly } from 'vue'
 
 const state = reactive({
   notebooks: [],
@@ -16,7 +16,8 @@ const state = reactive({
   currentNote: null,
   selectedNotebookId: null,
   selectedNoteId: null,
-  noteHistory: []
+  noteHistory: [],
+  isSyncing: false,
 })
 
 export function useApplicationStore() {
@@ -117,10 +118,54 @@ export function useApplicationStore() {
     state.currentNote = noteResponse.data
   }
 
+  // Synchronizes local joplin data/api server with remote store
+  const triggerSync = async () => {
+      if (state.isSyncing) return
+
+      // 1. Call Python backend via pywebview API
+      const res = await window.pywebview.api.trigger_sync()
+      if (!res.success) {
+        console.error('Failed to start sync:', res.error_data)
+        return
+      }
+
+      state.isSyncing = true
+      state.syncError = null
+
+      // 2. Recursive polling function
+      const checkStatus = async () => {
+        try {
+          const statusRes = await window.pywebview.api.get_sync_status()
+
+          if (statusRes.success && !statusRes.data.is_syncing) {
+            state.isSyncing = false
+
+            if (statusRes.data.error) {
+              state.syncError = statusRes.data.error
+              console.error('Sync failed:', statusRes.data.error)
+            } else {
+              console.debug('Sync completed successfully')
+              // TODO: Refresh your notebooks/notes lists here if necessary
+              // e.g., await loadNotebooks()
+            }
+          } else {
+            // Keep polling recursively every 1.5 seconds
+            setTimeout(checkStatus, 1500)
+          }
+        } catch (err) {
+          console.error('Error polling sync status:', err)
+          state.isSyncing = false
+        }
+      }
+
+      setTimeout(checkStatus, 1500)
+    }
+
   return {
-    state,
+    state: readonly(state),
     setBackendReady,
     selectNotebook,
     selectNote,
+    triggerSync,
   }
 }
