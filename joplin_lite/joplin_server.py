@@ -14,14 +14,16 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from . import JOPLIN_PROFILE_PATH
+
+
 # Keep track of the process internally within the module
 _active_process: subprocess.Popen | None = None
 
-logger = logging.getLogger("joplin_server")
+logger = logging.getLogger(__name__)
 
 # Default paths and settings
-JOPLIN_CONFIG_PATH = Path.home() / ".config/joplin-lite"
-JOPLIN_SETTINGS_FILEPATH = JOPLIN_CONFIG_PATH / "settings.json"
+JOPLIN_SETTINGS_FILEPATH = JOPLIN_PROFILE_PATH / "settings.json"
 DEFAULT_TIMEOUT = 15.0  # Seconds to wait for server to come online
 POLL_INTERVAL = 0.5     # Seconds between health check polls
 
@@ -64,7 +66,7 @@ def check_server_status() -> bool:
     # 1. Try CLI check first
     try:
         result = subprocess.run(
-            ["joplin", "--profile", str(JOPLIN_CONFIG_PATH), "server", "status"],
+            ["joplin", "--profile", str(JOPLIN_PROFILE_PATH), "server", "status"],
             capture_output=True,
             text=True,
             timeout=3.0
@@ -128,7 +130,7 @@ def start_server(stop_on_exit: bool = True) -> subprocess.Popen | None:
         log_file.write("Starting Joplin server...\n")
 
         _active_process = subprocess.Popen(
-            ["joplin", "--profile", str(JOPLIN_CONFIG_PATH), "server", "start"],
+            ["joplin", "--profile", str(JOPLIN_PROFILE_PATH), "server", "start"],
             stdout=log_file,
             stderr=subprocess.STDOUT,
             text=True

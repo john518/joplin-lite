@@ -12,11 +12,12 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from . import JOPLIN_PROFILE_PATH
 from joplin_lite.utils import build_notebook_tree
 
-logger = logging.getLogger("joplin_server")
+logger = logging.getLogger(__name__)
 
-STATE_FILE = Path.home() / ".config" / "joplin-lite" / "state.json"
+STATE_FILEPATH = JOPLIN_PROFILE_PATH / "state.json"
 
 
 class HttpMethod(str, Enum):
@@ -266,9 +267,9 @@ class Api:
     # These last methods are for saving/restoring the current notebook and note between sessions
     def get_user_state(self):
         """Retrieves the full user state dictionary from disk."""
-        if STATE_FILE.exists():
+        if STATE_FILEPATH.exists():
             try:
-                with open(STATE_FILE, "r") as f:
+                with open(STATE_FILEPATH, "r") as f:
                     return json.load(f)
             except Exception:
                 pass
@@ -282,11 +283,11 @@ class Api:
     def save_user_state_value(self, key, value):
         """Saves a single key-value preference to the state file."""
         try:
-            STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            STATE_FILEPATH.parent.mkdir(parents=True, exist_ok=True)
             state = self.get_user_state()
             state[key] = value
 
-            with open(STATE_FILE, "w") as f:
+            with open(STATE_FILEPATH, "w") as f:
                 json.dump(state, f, indent=2)
             return {"success": True}
         except Exception as e:
