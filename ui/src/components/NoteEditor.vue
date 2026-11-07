@@ -44,7 +44,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { debounce } from 'lodash-es'
 import { marked } from 'marked'
 import DOMPurify from 'isomorphic-dompurify'
 import { useApplicationStore } from '../composables/useApplicationStore.js'
@@ -57,6 +58,27 @@ const renderedMarkdown = computed(() => {
   const rawHtml = marked.parse(state.currentNote.body)
   return DOMPurify.sanitize(rawHtml)
 })
+
+// Debounced save function that calls Python API
+const saveNoteToBackend = debounce(async (note) => {
+  try {
+    await window.pywebview.api.update_note(note.id, note.title, note.body)
+    console.debug(`Auto-saved note ${note.id}`)
+  } catch (err) {
+    console.error('Failed to auto-save note:', err)
+  }
+}, 800) // Waits 800ms after the last keystroke before saving
+
+// Watch for any deep changes in the current note and trigger the debounce
+watch(
+  () => state.currentNote,
+  (newNote) => {
+    if (newNote) {
+      saveNoteToBackend(newNote)
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style scoped>

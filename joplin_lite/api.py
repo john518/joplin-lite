@@ -5,6 +5,7 @@ import logging
 import urllib.request
 import urllib.error
 import urllib.parse
+import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -219,6 +220,45 @@ class Api:
             "success": True,
             "data": response.data,
         }
+
+
+    def create_note(self, note_data: dict) -> dict:
+        """Creates a new note, optionally generating a 32-char hex ID if not provided."""
+        endpoint = "notes"
+
+        # Generate a 32-character hex UUID if the client didn't supply one
+        if "id" not in note_data:
+            note_data["id"] = uuid.uuid4().hex
+
+        response = self.request(HttpMethod.POST, endpoint, data=note_data)
+
+        if response.err_data:
+            return {"success": False, "error_data": response.err_data}
+
+        return {"success": True, "data": response.data}
+
+
+    def update_note(self, note_id: str, note_title: str, note_body: str) -> dict:
+        """Writes note back to Joplin API"""
+        endpoint = f"notes/{note_id}"
+        data = {
+            "title": note_title,
+            "body": note_body
+        }
+        response = self.request(HttpMethod.PUT, endpoint, data=data)
+
+        if response.err_data:
+            logger.error(f"Returning {response.err_data=}")
+            return {
+                "success": False,
+                "error_data": response.err_data,
+            }
+
+        return {
+            "success": True,
+            "data": response.data,
+        }
+
 
 
     # These last methods are for saving/restoring the current notebook and note between sessions
