@@ -1,5 +1,5 @@
 <template>
-  <div class="pane" v-if="state.currentNote">
+  <div class="pane" v-if="editableNote">
     <!-- Sync Lock Notification Banner -->
     <div v-if="state.isSyncing" class="sync-lock-banner">
       <span>🔄 Synchronization in progress... Editing temporarily locked.</span>
@@ -8,7 +8,8 @@
     <div class="editor-header">
       <input
         type="text"
-        v-model="state.currentNote.title"
+        v-model="editableNote.title"
+        @input="handleInput"
         :disabled="state.isSyncing"
         class="title-input"
         placeholder="Note Title..."
@@ -34,7 +35,8 @@
     <div class="editor-content">
       <textarea
         v-show="activeTab === 'write'"
-        v-model="state.currentNote.body"
+        v-model="editableNote.body"
+        @input="handleInput"
         :disabled="state.isSyncing"
         class="markdown-textarea"
         placeholder="Write markdown here..."
@@ -62,15 +64,17 @@ import { useApplicationStore } from '../composables/useApplicationStore.js'
 const { state } = useApplicationStore()
 const activeTab = ref('write')
 
+// Local mutable copy of the note for v-model binding
+const editableNote = ref(null)
+
 const renderedMarkdown = computed(() => {
-  if (!state.currentNote?.body) return '<p class="placeholder-text">Nothing to preview...</p>'
-  const rawHtml = marked.parse(state.currentNote.body)
+  if (!editableNote.value?.body) return '<p class="placeholder-text">Nothing to preview...</p>'
+  const rawHtml = marked.parse(editableNote.value.body)
   return DOMPurify.sanitize(rawHtml)
 })
 
-// Debounced save function that calls Python API
+// Debounced save function calling Python API
 const saveNoteToBackend = debounce(async (note) => {
-  // Guard clause: Do not trigger auto-saves while a remote sync is active
   if (state.isSyncing) return
 
   try {
@@ -79,18 +83,33 @@ const saveNoteToBackend = debounce(async (note) => {
   } catch (err) {
     console.error('Failed to auto-save note:', err)
   }
-}, 800) // Waits 800ms after the last keystroke before saving
+}, 800)
 
-// Watch for any deep changes in the current note and trigger the debounce
+// Watch store's currentNote to handle note switching
 watch(
   () => state.currentNote,
   (newNote) => {
-    if (newNote && !state.isSyncing) {
-      saveNoteToBackend(newNote)
+    if (!newNote) {
+      editableNote.value = null
+      saveNoteToBackend.cancel()
+      return
+    }
+
+    // If a different note was selected from the sidebar/list
+    if (newNote.id !== editableNote.value?.id) {
+      saveNoteToBackend.cancel() // Cancel pending saves for the old note
+      editableNote.value = { ...newNote } // Clone into local state
     }
   },
-  { deep: true }
+  { immediate: true }
 )
+
+// Triggered instantly by keystrokes on the local copy
+const handleInput = () => {
+  if (editableNote.value && !state.isSyncing) {
+    saveNoteToBackend(editableNote.value)
+  }
+}
 </script>
 
 <style scoped>
