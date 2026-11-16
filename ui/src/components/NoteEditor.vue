@@ -1,9 +1,15 @@
 <template>
   <div class="pane" v-if="state.currentNote">
+    <!-- Sync Lock Notification Banner -->
+    <div v-if="state.isSyncing" class="sync-lock-banner">
+      <span>🔄 Synchronization in progress... Editing temporarily locked.</span>
+    </div>
+
     <div class="editor-header">
       <input
         type="text"
         v-model="state.currentNote.title"
+        :disabled="state.isSyncing"
         class="title-input"
         placeholder="Note Title..."
       />
@@ -29,6 +35,7 @@
       <textarea
         v-show="activeTab === 'write'"
         v-model="state.currentNote.body"
+        :disabled="state.isSyncing"
         class="markdown-textarea"
         placeholder="Write markdown here..."
       ></textarea>
@@ -63,6 +70,9 @@ const renderedMarkdown = computed(() => {
 
 // Debounced save function that calls Python API
 const saveNoteToBackend = debounce(async (note) => {
+  // Guard clause: Do not trigger auto-saves while a remote sync is active
+  if (state.isSyncing) return
+
   try {
     await window.pywebview.api.update_note(note.id, note.title, note.body)
     console.debug(`Auto-saved note ${note.id}`)
@@ -75,7 +85,7 @@ const saveNoteToBackend = debounce(async (note) => {
 watch(
   () => state.currentNote,
   (newNote) => {
-    if (newNote) {
+    if (newNote && !state.isSyncing) {
       saveNoteToBackend(newNote)
     }
   },
@@ -97,6 +107,18 @@ watch(
   align-items: center;
 }
 
+.sync-lock-banner {
+  background-color: #264f78;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .editor-header {
   display: flex;
   justify-content: space-between;
@@ -114,6 +136,12 @@ watch(
   border-radius: 4px;
   background: transparent;
   color: inherit;
+}
+
+.title-input:disabled,
+.markdown-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .tabs {
