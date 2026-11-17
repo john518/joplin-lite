@@ -12,7 +12,7 @@
         @click="handleNoteClick(note.id)"
         :class="{ active: state.selectedNoteId === note.id}"
       >
-        <span class="note-title">{{ note.title }}</span>
+        <span class="note-title">{{ note.title || 'Untitled'}}</span>
         <hr />
       </li>
     </ul>

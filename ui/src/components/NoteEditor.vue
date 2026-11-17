@@ -9,7 +9,7 @@
       <input
         type="text"
         v-model="editableNote.title"
-        @input="handleInput"
+        @input="handleTitleInput"
         :disabled="state.isSyncing"
         class="title-input"
         placeholder="Note Title..."
@@ -61,7 +61,7 @@ import { marked } from 'marked'
 import DOMPurify from 'isomorphic-dompurify'
 import { useApplicationStore } from '../composables/useApplicationStore.js'
 
-const { state } = useApplicationStore()
+const { state, updateNoteTitle } = useApplicationStore()
 const activeTab = ref('write')
 
 // Local mutable copy of the note for v-model binding
@@ -103,12 +103,26 @@ watch(
   },
   { immediate: true }
 )
-
-// Triggered instantly by keystrokes on the local copy
+// Triggered by keystrokes on the local copy (body)
+// Also called by handleTitleInput
 const handleInput = () => {
   if (editableNote.value && !state.isSyncing) {
     saveNoteToBackend(editableNote.value)
   }
+}
+
+// Triggered by keystrokes on the title input
+const handleTitleInput = (e) => {
+  if (!editableNote.value)
+    return
+
+  const newTitle = e.target.value
+
+  // 1. Instantly update the note title in the store array so NoteList.vue updates live
+  updateNoteTitle(editableNote.value.id, newTitle)
+
+  // 2. Call handleInput to schedule debounced save to backend
+  handleInput()
 }
 </script>
 

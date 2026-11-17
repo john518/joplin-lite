@@ -143,6 +143,15 @@ export function useApplicationStore() {
     }
   }
 
+
+  // Updates the title of a note in the local store array (for notifying NoteList)
+  const updateNoteTitle = (noteId, newTitle) => {
+    const note = state.notes.find(n => n.id === noteId)
+    if (note) {
+      note.title = newTitle
+    }
+  }
+
   // Synchronizes local joplin data/api server with remote store
   const triggerSync = async () => {
       if (state.isSyncing) return
@@ -192,6 +201,7 @@ export function useApplicationStore() {
     selectNotebook,
     selectNote,
     createNote,
+    updateNoteTitle,
     triggerSync,
   }
 }
