@@ -118,6 +118,31 @@ export function useApplicationStore() {
     state.currentNote = noteResponse.data
   }
 
+
+  // Creates a new note via pywebview API and updates store state.
+  const createNote = async () => {
+    try {
+      // Determine parent notebook ID (null if 'All Notes' / 0 is selected)
+      const parentId = state.selectedNotebookId === 0 ? null : state.selectedNotebookId
+
+      const response = await window.pywebview.api.create_note({
+        title: 'Untitled Note',
+        body: '',
+        parent_id: parentId
+      })
+
+      if (response.success && response.data) {
+        const newNote = response.data
+        // Mutate store state internally (valid even if store exports readonly state)
+        state.notes.unshift(newNote)
+        selectNote(newNote.id)
+        console.debug(`Created note ${newNote.id}`)
+      }
+    } catch (err) {
+      console.error('Failed to create note:', err)
+    }
+  }
+
   // Synchronizes local joplin data/api server with remote store
   const triggerSync = async () => {
       if (state.isSyncing) return
@@ -166,6 +191,7 @@ export function useApplicationStore() {
     setBackendReady,
     selectNotebook,
     selectNote,
+    createNote,
     triggerSync,
   }
 }

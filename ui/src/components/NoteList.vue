@@ -22,34 +22,14 @@
 <script setup>
   import { onMounted, onUnmounted } from 'vue'
   import { useApplicationStore } from '../composables/useApplicationStore.js'
-  const { state, selectNote } = useApplicationStore()
+
+  // Destructure createNote alongside state and selectNote
+  const { state, selectNote, createNote } = useApplicationStore()
 
   const handleNoteClick = (id) => {
-    // Update if the clicked notebook is not currently selected
     if (id !== state.selectedNoteId) {
       console.debug(`Selected note ${id}`)
       selectNote(id)
-    }
-}  // handleNoteClick
-
-
-  const createNote = async () => {
-    try {
-      const response = await window.pywebview.api.create_note({
-        title: 'Untitled Note',
-        body: '',
-        // If selectedNotebookId is 0 (All Notes), pass null or omit it
-        parent_id: state.selectedNotebookId === 0 ? null : state.selectedNotebookId
-      })
-
-      if (response.success && response.data) {
-        const newNote = response.data
-        state.notes.unshift(newNote)
-        selectNote(newNote.id)
-        console.debug(`Created note ${newNote.id}`)
-      }
-    } catch (err) {
-      console.error('Failed to create note:', err)
     }
   }
 
